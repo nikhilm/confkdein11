@@ -1,0 +1,181 @@
+TODO! Copy actual qhttpserver to oboy folder once it is stable and complete
+HTTP routes and server (server in C++, delegates to JS)
+
+We have: 2 hours
+
+Morning etc.
+
+Pardon me for the cheesy title, this talk is about...
+
+Tap
+
+...extending Qt applications with
+JavaScript. We'll be going through a lot of stuff in 2 hours, so the session will be intense.
+I assume you know your Qt fundamentals well, which
+includes signals and slots, events and some meta-object capabilities. Knowledge
+of JavaScript is not essential for the most part, but it does affect how we
+code and so an understanding of JavaScript's slippery `this` variable and
+closures will serve you well.
+
+Tap
+
+I'm Nikhil Marathe, student and KDE contributor. I've worked on various parts of KDE,
+mainly Amarok but with patches in a lot of other places.
+
+Tap.
+
+I'm a scratch-an-itch
+programmer, which means I will often jump from one project to another, fixing things where
+they annoy me. This talk is not just about what you can get in the Qt documentation. In
+experiments I've learnt some useful techniques and some mousetraps that I hope will help
+you avoid them. My interest in QtScripting was ignited when I started working on Chrome
+extension support for Rekonq, unfortunately that project has been stagnant for a few
+months due to certain issues.
+
+Tap
+
+Our high-level plan is an introduction, followed by quick basic examples of integrating
+JavaScript. The long story is a basic implementation of the browser Canvas API using QtScript
+which will allow us to explore various classes and techniques. In addition Qt bundles the
+WebKit engine, whose JavaScript integration and behaviour is slightly different from QtScript.
+So we will take a look at that and then conclude the session.
+
+To begin, some quick background.
+
+Tap
+
+Why would you want to use scripting?
+
+Allows user customisation of your application. If you are creating a game, players can write AI bots, a paint program might have filters.
+In fact the KDE Window Manager has scripting support to control window placement and other settings on the fly.
+With Qt Script you can control the level of integration you want to provide. In addition, unlike extensions written in C++, you don't have
+to worry about security issues or your application crashing because of faulty 3rd party code.
+When you think of scripting Lua is usually the first language that pops up. It is definitely a great language, but JavaScript has a
+much larger mass of users. In addition JavaScript's evented model fits in perfectly with Qt's signals and slots. In addition, since
+QtScript is part of Qt, you don't have to worry about bundling a runtime. With Qt supporting a slew of mobile devices your applications
+can run directly on those platforms as well.
+
+Tap.
+
+Qt script has been a part of the standard Qt distribution since version 4.3.0. This tutorial will use 4.7 though, so I can't guarantee
+everything here will work in older versions.
+
+Tap
+
+As of now, QtScript has support for JavaScript 1.5, including
+accessors, array functions and JSON support, but does not support bind() ,  making objects 'read only' and other features.
+
+Internally QtScript uses the JavaScriptCore engine used by WebKit, but this is an implementation detail and you should not rely on
+this being always true and make assumptions about performance or other factors.
+
+Tap 
+
+If you want to follow along with me, you should check out the code, all of which is in the qtjs folder
+
+Tap 
+
+QtScript
+========
+The module providing scripting support is called QtScript. In particular we will be making use of 4 key classes:
+
+Tap
+
+QScriptEngine which evaluates scripts and allows us to observe and interact with results
+QScriptValue which wraps Qt/C++ types and exposes them to the JavaScript environment
+QScriptContext which manages the dynamic nature of JavaScript's functions, and
+QScriptable which allows C++ code to access various function properties during the invocation
+
+Tap
+
+Including QtScript in your program is a 2-step process:
+
+Tap
+
+and
+
+Tap 
+
+depending on whether you are using qmake or CMake respectively
+
+With that out of the way, we are ready to code.
+
+The first couple of examples are in the basics folder, just run qmake in basics to compile all of them
+
+Example 1 is simply executing a javascript program:
+
+open hello.cpp
+
+We create a QScriptEngine instance and let it evaluate the script. There is an associated class called QScriptProgram which can take the string and keep it in compiled form internally. This is useful if you want to execute the program multiple times.
+
+To watch out for errors, and report them, the engine provides a couple of functions useful after calling evaluate.
+
+open errors/errors.cpp
+
+explain
+
+An errant script is your worst nightmare when shipping a program, it could freeze up the rest of the program and create a negative impression. You can request event loop evaluation every few seconds, and keep a track of how long a script has been running to avoid such a scenario.
+
+open timeout/timeout.cpp
+
+explain
+
+Now that we are executing scripts, what we would really like is to start introducing Qt objects into our scripts.
+
+open intro_num
+
+The global object is available using QScriptEngine::globalObject(). In JavaScript everything is a named property of some other (parent) object. So when we call setProperty("theAnswer") on the global object, we introduce theAnswer as a global variable. QScriptValue() is a wrapper to aid in converting C++ types to JS and back.
+
+But we aren't restricted to just introducing primitives into the script execution environment. Using the Meta-Object System's powerful introspection capabilities, QObjects can be injected, and their properties, signals and slots are all available automagically in QtScript. The next contrived example demonstrates.
+
+open linetext
+
+If you check QLineEdit, text is a property, so its available in the script.
+
+Similarly, you can directly set up signal and slot connections in the script itself.
+
+open linetext2
+
+Signals become pseudo objects with connect and disconnect methods. Slots can be any JavaScript functions. By default the 'this' object for the function when it executes is the global object. You can use a second form of connect to redefine the this object for the slot.
+
+open linetext3
+
+and show.
+
+Qt has a notion of the object heirarchy in a program, defined with the parent attribute which can be set for all QObject's. Due to this, all of an Object's children are also available in the object.
+
+open and show naming
+
+This raises a whole host of questions about how you can secure your own objects when they are introduced. Consider the example
+
+open access
+
+Here we let the QtScript code call deleteLater. A few times through the event loop, the object gets deleted. If you made your application scriptable, a rogue script called deleteLater, it could make your application crash. Qt provides a way to control how much access QtScript code gets to C++ objects introduced into the scope. You can exclude super class properties, exclude child objects, exclude just the deleteLater, or all slots, using the third argument to the newQObject() method. Show commented line.
+
+When you want access to all the properties, but still want to be safe, its best to keep the classes that get injected into QtScript separate from the ones that actually drive your application. For example in Rekonq, the extension to allow control over Tabs is in a parallel class rather than extending the actual class managing tabs in rekonq. This parallel class exposes only the extensions API, and talks with the main tab class as required.
+
+Now that we have the fundamentals of QtScript in place, its time for something fun. We are going to create a simple web application framework in JavaScript backed by Qt. A mini node.js just to prove what is possible with QtScript and learn a few other things about QtScript along the way.
+
+Write a web framework in this
+
+Using 'data' signal and 'end' and 'error' signal we get to use signals and slots
+
+Since we pass in a function as a callback to the Server object (and maybe to SQL) we get function objects and calling a JS function from native code.
+
+By providing access to headers, we get property access
+
+Use QtScriptGenerator's SQL bindings to also show extensions and inform that all of Qt is available within script objects
+
+Also show constructor objects using crypto
+Show function arguments counting and type checking in the crypto part
+Show prototype by using either hexdigest method on crypto class or something with routing or database.
+
+Show access to currying and stuff by using the activation object in templating
+
+Use QHttpServer
+
+var serv = new 
+
+Webkit
+------
+
+Some simple browser in which special action happens on google.com or something.
