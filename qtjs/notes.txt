@@ -155,6 +155,10 @@ When you want access to all the properties, but still want to be safe, its best 
 
 Now that we have the fundamentals of QtScript in place, its time for something fun. We are going to create a simple web application framework in JavaScript backed by Qt. A mini node.js just to prove what is possible with QtScript and learn a few other things about QtScript along the way.
 
+First open oboy/examples/basic.js to get an idea of what we are aiming for.
+
+The first task is to introduce the createServer function. Interestingly it accepts a callback function which will be called for every request. JavaScript has first class functions you can pass around, but C++ doesn't! Fortunately the multi-talented QScriptValue treats a function as just another JavaScript value, and allows you to call it when you see fit. [Also discuss how we introd normal C++ function using engine.newFunction]
+
 Write a web framework in this
 
 Using 'data' signal and 'end' and 'error' signal we get to use signals and slots
