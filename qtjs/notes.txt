@@ -157,15 +157,41 @@ Now that we have the fundamentals of QtScript in place, its time for something f
 
 First open oboy/examples/basic.js to get an idea of what we are aiming for.
 
-The first task is to introduce the createServer function. Interestingly it accepts a callback function which will be called for every request. JavaScript has first class functions you can pass around, but C++ doesn't! Fortunately the multi-talented QScriptValue treats a function as just another JavaScript value, and allows you to call it when you see fit. [Also discuss how we introd normal C++ function using engine.newFunction]
+The first task is to introduce the createServer function. Interestingly it accepts a callback function which will be called for every request. JavaScript has first class functions you can pass around, but C++ doesn't! Fortunately the multi-talented QScriptValue treats a function as just another JavaScript value, and allows you to call it when you see fit. [Also discuss how we introd normal C++ function using engine.newFunction]. So why would you want to create a function and manually inject it into the script runtime when injecting a QObject does it all for free? Apart from obvious design reasons, the main use is to support variable arguments and type checking. When slots are invoked automatically by QtScript, it tries to do a best possible match of the formal C++ arguments and the JavaScript equivalents. But if the match fails, it simply drops the call. Using the manual approach gives you more control. Also with the newQObject approach you have to create an instance of an object and introduce it. But what we want in this case is to create a new server on every invocation of the createServer function. An alternate way is to use Qt's meta-object system, but this one is simpler.
 
-Write a web framework in this
+All injected functions should have a function prototype of 
 
-Using 'data' signal and 'end' and 'error' signal we get to use signals and slots
+show in Prezi -
 
-Since we pass in a function as a callback to the Server object (and maybe to SQL) we get function objects and calling a JS function from native code.
+The returned QScriptValue() is treated as the return value of the JavaScript function. If you now open
 
+open oboy/main.cpp
+
+we define the createServer() function. The context object provides all the information about the environment, including the arguments passed to the function, the this object, and the 'activation object'. We validate the argument as being a callback function and pass it along to the Oboy server. We then wrap the server instance and return it.
+
+open oboy/oboy.cpp
+
+Oboy is nothing but a very lightweight responder to QHttpServer whose job is to forward the newRequest signal to invoke the callback function. The interesting thing is that we set ownership of the request and response objects when we introduce them to the QtScript engine. We no longer have to deal with the memory cleanup.
+
+Finally in main.cpp, we inject the function as a property of the global object and we are good to go! Compile and run
+
+./oboy examples/basic.js
+
+So why couldn't we simply introduce QHttpServer into the script and connect a function to its newRequest slot? We could, but for the purposes of this session, this method allows me to introduce more concepts.
+
+Since signals are already available for free, an echo server is now trivial.
+
+show oboy/echo.js and run
+
+If you have been observant, you may have realised that the oboy class defines its own listen method too. We don't want to make listen a slot, so we instead tag the declaration with Q_INVOKABLE.
+
+Similarly properties declared with Q_PROPERTY are also available in the script environment. Basically, anything the meta object system has access too, is available in the QtScript system, so you aren't bounded in any way.
+
+Now the default 
+By overriding writeHead to accept object literal with headers
+we get QVariantMap
 By providing access to headers, we get property access
+
 
 Use QtScriptGenerator's SQL bindings to also show extensions and inform that all of Qt is available within script objects
 
