@@ -141,6 +141,10 @@ open linetext3
 
 and show.
 
+Similarly you can invoke signals from the script by treating them as a function call
+
+open linetext4
+
 Qt has a notion of the object heirarchy in a program, defined with the parent attribute which can be set for all QObject's. Due to this, all of an Object's children are also available in the object.
 
 open and show naming
@@ -179,6 +183,8 @@ Finally in main.cpp, we inject the function as a property of the global object a
 
 So why couldn't we simply introduce QHttpServer into the script and connect a function to its newRequest slot? We could, but for the purposes of this session, this method allows me to introduce more concepts.
 
+Remember that these wrapped functions cannot be methods belonging to objects. So you can only use static methods or plain jane C-like functions.
+
 Since signals are already available for free, an echo server is now trivial.
 
 show oboy/echo.js and run
@@ -190,20 +196,24 @@ Similarly properties declared with Q_PROPERTY are also available in the script e
 Now the default 
 By overriding writeHead to accept object literal with headers
 we get QVariantMap
-By providing access to headers, we get property access
 
+open oboy_writehead
+
+By providing access to headers, we get conversion functions and meta object
+
+open oboy_headers
 
 Use QtScriptGenerator's SQL bindings to also show extensions and inform that all of Qt is available within script objects
 
-Also show constructor objects using crypto
-Show function arguments counting and type checking in the crypto part
-Show prototype by using either hexdigest method on crypto class or something with routing or database.
+open oboy_ext
 
-Show access to currying and stuff by using the activation object in templating
+Then explain the concept of extensions
 
-Use QHttpServer
+create router to show call as constructor
 
-var serv = new 
+create wiki
+
+show custom QScriptClass class by defining header access based on property access.
 
 Webkit
 ------
