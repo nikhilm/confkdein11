@@ -203,17 +203,18 @@ By providing access to headers, we get conversion functions and meta object
 
 open oboy_headers
 
-Use QtScriptGenerator's SQL bindings to also show extensions and inform that all of Qt is available within script objects
+Use QtScriptGenerator's SQL bindings to show RSS fetch and parse
 
 open oboy_ext
 
 Then explain the concept of extensions
 
-create router to show call as constructor
+show custom QScriptClass class by writing a simple ORM.
+QScriptClass was introduced in Qt 4.4.
+
+open oboy_classy
 
 create wiki
-
-show custom QScriptClass class by defining header access based on property access.
 
 Webkit
 ------
