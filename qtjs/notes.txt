@@ -203,16 +203,14 @@ By providing access to headers, we get conversion functions and meta object
 
 open oboy_headers
 
-Use QtScriptGenerator's SQL bindings to show RSS fetch and parse
-
-open oboy_ext
-
 Then explain the concept of extensions
+
+open oboy_ext/fetch.js
 
 show custom QScriptClass class by writing a simple ORM.
 QScriptClass was introduced in Qt 4.4.
 
-open oboy_classy
+open oboy_ext/db.* and query.js
 
 create wiki
 
