@@ -1,5 +1,5 @@
 TEMPLATE = app
-QT += script network
+QT += script network sql
 QT -= gui
 CONFIG += debug
 

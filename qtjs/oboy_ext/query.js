@@ -1,27 +1,31 @@
-if(load("qt.sql") != undefined)
-    throw Error("No qt.sql module available");
+var conn = new DB("database.db");
+if(!conn)
+    throw Error("Error connecting to database");
 
-var conn = QSqlDatabase.addDatabase("QSQLITE", "default");
-conn.setDatabaseName("mock.db");
-if(!conn.open())
-    throw Error("Error opening mock.db");
+// INSERT
+conn.insert('planet', {'name': 'Shantanu Tushar Jha', 'blog': 'http://shantanutushar.com'});
 
-var server = createServer(function(req, res) {
-    print("Connection!");
+conn.insert('planet', {'blog': 'http://kodeclutz.blogspot.com', 'name': 'Nikhil Marathe'});
+// SELECT
+print("--- GET");
+var result = conn.get('planet');
+while(result.next) {
+    print(result['name'] + " -> " + result['blog']);
+}
 
-    res.writeHead(200, {
-        'Content-Type': 'text/html',
-    });
+// SELECT where
+print("--- GET WHERE");
+var result = conn.getWhere('planet', {'name': 'Nikhil Marathe'});
+while(result.next) {
+    print(result['name'] + " -> " + result['blog']);
+}
 
-    res.write("<html><head><title>Freshest Meat</title></head><body><h1>The Freshesh Meat is at conf.kde.in!</h1><ul>");
-    
-    var q = new QSqlQuery(conn);
-    q.exec("select title, link from up;");
-    while(q.next()) {
-        res.write('<li><a href="'+q.value(1) + '">' + q.value(0) + '</a></li>\n');
-    }
+// UPDATE
+print('--- After UPDATE')
+conn.update('planet', {'blog': 'http://nytimes.com'}, {'name': 'Nikhil Marathe'});
 
-    res.end("</ul></body></html>");
-});
-
-server.listen(5000);
+print("--- GET");
+var result = conn.get('planet');
+while(result.next) {
+    print(result['name'] + " -> " + result['blog']);
+}

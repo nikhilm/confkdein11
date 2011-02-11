@@ -1,9 +1,11 @@
+#include "oboy_ext.h"
+
 #include <QCoreApplication>
 #include <QStringList>
 #include <QtScript>
 #include <QDebug>
 
-#include "oboy_ext.h"
+#include "db.h"
 
 QScriptValue createServer(QScriptContext *context, QScriptEngine *engine)
 {
@@ -24,6 +26,11 @@ QScriptValue load(QScriptContext *context, QScriptEngine *engine)
     return engine->importExtension(context->argument(0).toString());
 }
 
+QScriptValue createDB(QScriptContext *context, QScriptEngine *engine)
+{
+    return engine->newQObject(new DB(context->argument(0).toString(), engine));
+}
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
@@ -41,6 +48,7 @@ int main(int argc, char **argv)
     
     engine.globalObject().setProperty("createServer", engine.newFunction(createServer));
     engine.globalObject().setProperty("load", engine.newFunction(load));
+    engine.globalObject().setProperty("DB", engine.newFunction(createDB));
 
     QFile file(arguments[1]);
     if( !file.open(QFile::ReadOnly) )
