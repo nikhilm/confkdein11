@@ -1,0 +1,6 @@
+<h1>Editing <%= title %></h1>
+
+<form action="/edit/<%= title %>" method="POST">
+    <textarea name="content" rows="40" cols="80"><%= content %></textarea>
+    <input type="submit" value="Save"></input>
+</form>

@@ -1,0 +1,1 @@
+create table wiki (title text primary key, content blob);
