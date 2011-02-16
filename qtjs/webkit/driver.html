@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>QtWebKit demo driver</title>
+        <script language="javascript">
+            var init = function() {
+                document.getElementById('answer').innerText = "The answer is " + window.theDemo.answer;
+
+                window.theDemo.smiley().assignToHTMLImageElement(document.getElementById('smiley'));
+            }
+        </script>
+    </head>
+    <body onload="init();">
+        <div id="answer"></div>
+
+        <img id="smiley"></img>
+    </body>
+</html>
