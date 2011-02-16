@@ -39,6 +39,15 @@ QPixmap TheDemo::smiley()
     return pixmap;
 }
 
+void TheDemo::promoteQt()
+{
+    QWebElement p = m_frame->documentElement().findFirst("p#blurb");
+    QString orig = p.toInnerXml();
+    QString repl = orig.replace("qt", "<strong>Qt</strong>", Qt::CaseInsensitive);
+    QWebElement p2 = m_frame->documentElement().findFirst("p#blank");
+    p2.setInnerXml(repl);
+}
+
 void TheDemo::inject()
 {
     m_frame = qobject_cast<QWebFrame*>(QObject::sender());

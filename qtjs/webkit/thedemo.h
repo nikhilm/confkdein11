@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPixmap>
+#include <QWebElement>
 
 class QWebFrame;
 
@@ -20,6 +21,7 @@ public:
 
 public slots:
     void inject();
+    void promoteQt();
 
 private:
     QWebFrame *m_frame;
