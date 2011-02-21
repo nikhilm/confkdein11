@@ -6,16 +6,11 @@ if(load("qt.core") != undefined)
 var baseUrl = 'http://localhost:5000';
 
 var render = function(fn, data) {
-    print("HERE");
     var f = new QFile(fn);
-    print("HERE");
     if(!f.open(QIODevice.ReadOnly))
         throw new Error("Error loading template " + fn);
-    print("HERE");
 
-    print("HERE");
     var ts = new QTextStream(f);
-    print("HERE");
     return _.template(ts.readAll(), data);
 }
 
