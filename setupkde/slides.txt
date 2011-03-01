@@ -1,0 +1,136 @@
+.. include:: <s5defs.txt>
+
+.. footer:: conf.kde.in - March 2011
+
+.. role:: vcenter
+
+Start KoDEing
+=============
+
+.. class:: center
+
+Nikhil Marathe
+
+Outline
+-------
+
+* The KDE SC modules
+* How we we work
+* Setting up a development environment
+* Your first bug fix
+* Tips and tricks
+
+Junior Jobs
+-----------
+
+* All Junior Jobs http://is.gd/ftk7l
+* Pick one which interests you
+* Dig through the code
+* Aim for minimum changes
+
+Layout
+------
+
+.. class:: incremental
+
+* Qt
+* Phonon + backend
+* Support
+* KDE Platform
+* Other modules
+* Extragear
+* Playground
+
+Development cycle
+-----------------
+
+* Find a bug/feature
+* Pull latest code
+* Make changes
+* Submit a review request
+* Get somebody to commit
+
+We use git
+----------
+
+except a bit of subversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* So run `git|svn diff` to get changed code for review
+
+Code Review
+----------------
+
+* Submit to [git.]reviewboard.kde.org
+* Any major code, especially features
+* Even if you are a core developer of the project.
+
+Release Schedule
+----------------
+
+* 6 month release schedule
+* Although sub projects might have different Cycles
+    * Amarok has a shorter 6 week cycle
+* Understand *string freeze*, *feature freeze*
+* You don't need to know all of this at once
+
+Setting up a development environment
+------------------------------------
+
+A little investment for the first time.
+
+* Quite a number of packages, but very repetitive and just 1 command each
+* Useful: http://techbase.kde.org/Getting_Started/Build/KDE4/Prerequisites
+
+Setting up a development environment
+------------------------------------
+
+* Grab this shell script (from now on called ``kdebashrc``)
+    * http://codepad.org/rB1qtOot
+* Understand it
+* ``mkdir -p ~/kdedev/{src,build,install}``
+* ``source kdebashrc && cs``
+
+Phonon
+-------------
+
+* `git://anongit.kde.org/phonon`
+* ``cd phonon && cmakekde && cd ..``
+* `git://anongit.kde.org/phonon-vlc`
+* rinse and repeat
+
+Prerequisites
+-------------
+
+* Get and build DbusMenu
+    * google dbusmenu 0.6.0 rpm
+    * `git://gitorious.org/dbusmenu/dbusmenu-qt.git <git://gitorious.org/dbusmenu/dbusmenu-qt.git>`_
+    * ``cmakekde``
+
+Compile
+-------
+
+* Now grab and compile trunk
+    * kdesupport
+    * KDE/kdelibs
+    * KDE/kdebase
+
+Run
+---
+
+* Console login
+* Edit .xinitrc::
+
+    source kdebashrc
+    ck-launch-session startkde
+
+* ``$ xinit``
+
+.. class:: handout
+
+Watchout
+--------
+
+* Use version compatible APIs
+* If X has Qt 4.5 as a requirement:
+    * you can't use a function introduced in Qt 4.7
