@@ -81,6 +81,7 @@ A little investment for the first time.
 
 * Quite a number of packages, but very repetitive and just 1 command each
 * Useful: http://techbase.kde.org/Getting_Started/Build/KDE4/Prerequisites
+* The build is almost never broken. It's your fault.
 
 Setting up a development environment
 ------------------------------------
@@ -126,11 +127,68 @@ Run
 
 * ``$ xinit``
 
-.. class:: handout
-
-Watchout
---------
+Watch out
+---------
 
 * Use version compatible APIs
 * If X has Qt 4.5 as a requirement:
     * you can't use a function introduced in Qt 4.7
+
+Your first bug fix
+------------------
+
+Tips and tricks
+---------------
+
+* Before you begin get a good conceptual grasp of the code.
+    * This means you HAVE TO READ! Everything!
+        * Yes, seriously!
+* When in doubt:
+    * `git blame`
+    * Try experimenting
+    * Contact maintainer/project mailing list
+* Code fearlessly
+* Follow the file coding style!
+
+Code reading
+------------
+
+* Use an editor supporting jumps
+* In `vi(m)` use `*`, `Ctrl+O` and `Ctrl+I`
+* `ack` finds everything - http://betterthangrep.com
+* Identify common patterns
+
+Code writing
+------------
+
+* always try and assert your `QObject::connect()`
+* Signals and slots require fully qualified names
+* Liberally sprinkle `Q_ASSERT()` while coding
+    * but remember, assertions are not a replacement for error handling
+
+Common mistakes
+---------------
+
+* Did you source your kdebashrc?
+* Did you add your source file to CMakeLists.txt?
+* Did you assert your connections?
+* Is your code being executed?
+
+Debugging
+---------
+
+* kdebugdialog and kdeinit4
+* kDebug() and friends.
+
+Finally...
+----------
+
+    | May your base cases always be defined,
+    | May your code always elude perplexity,
+    | May your run times always be confined
+    | to the lowest asymptotic complexity.
+
+.. class:: center
+
+Thank You
+~~~~~~~~~
