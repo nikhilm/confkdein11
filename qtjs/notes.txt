@@ -1,13 +1,11 @@
-TODO! Copy actual qhttpserver to oboy folder once it is stable and complete
-HTTP routes and server (server in C++, delegates to JS)
-
 We have: 2 hours
+
+Title
+------
 
 Morning etc.
 
 Pardon me for the cheesy title, this talk is about...
-
-Tap
 
 ...extending Qt applications with
 JavaScript. We'll be going through a lot of stuff in 2 hours, so the session will be intense.
@@ -17,95 +15,62 @@ of JavaScript is not essential for the most part, but it does affect how we
 code and so an understanding of JavaScript's slippery `this` variable and
 closures will serve you well.
 
-Tap
+About me
+--------
+* Student
+* Scratch-an-itch programmer, worked on various areas of KDE, mainly the Amarok music player
 
-I'm Nikhil Marathe, student and KDE contributor. I've worked on various parts of KDE,
-mainly Amarok but with patches in a lot of other places.
+Background
+-----------
 
-Tap.
-
-I'm a scratch-an-itch
-programmer, which means I will often jump from one project to another, fixing things where
-they annoy me. This talk is not just about what you can get in the Qt documentation. In
-experiments I've learnt some useful techniques and some mousetraps that I hope will help
-you avoid them. My interest in QtScripting was ignited when I started working on Chrome
-extension support for Rekonq, unfortunately that project has been stagnant for a few
-months due to certain issues.
-
-Tap
-
-Our high-level plan is an introduction, followed by quick basic examples of integrating
-JavaScript. The long story is a basic implementation of the browser Canvas API using QtScript
-which will allow us to explore various classes and techniques. In addition Qt bundles the
-WebKit engine, whose JavaScript integration and behaviour is slightly different from QtScript.
-So we will take a look at that and then conclude the session.
-
-To begin, some quick background.
-
-Tap
+Can someone tell me what scripting is?
 
 Why would you want to use scripting?
-
-Allows user customisation of your application. If you are creating a game, players can write AI bots, a paint program might have filters.
+Allows user customisation of your application. If you are creating a game, players can write AI bots, a paint program might have image filters.
 In fact the KDE Window Manager has scripting support to control window placement and other settings on the fly.
+
 With Qt Script you can control the level of integration you want to provide. In addition, unlike extensions written in C++, you don't have
 to worry about security issues or your application crashing because of faulty 3rd party code.
-When you think of scripting Lua is usually the first language that pops up. It is definitely a great language, but JavaScript has a
-much larger mass of users. In addition JavaScript's evented model fits in perfectly with Qt's signals and slots. In addition, since
-QtScript is part of Qt, you don't have to worry about bundling a runtime. With Qt supporting a slew of mobile devices your applications
+
+Why JavaScript?
+When you think of scripting Lua is usually the first language that pops up. 
+Large user base, increasing integration with the web. In addition JavaScript's evented model fits in perfectly with Qt's signals and slots. Since
+QtScript is part of Qt, you don't have to worry about bundling external libraries. With Qt supporting a slew of mobile devices your applications
 can run directly on those platforms as well.
 
-Tap.
-
-Qt script has been a part of the standard Qt distribution since version 4.3.0. This tutorial will use 4.7 though, so I can't guarantee
+QtScript has been a part of the standard Qt distribution since version 4.3.0. This tutorial will use 4.7 though, so I can't guarantee
 everything here will work in older versions.
-
-Tap
-
-As of now, QtScript has support for JavaScript 1.5, including
-accessors, array functions and JSON support, but does not support bind() ,  making objects 'read only' and other features.
 
 Internally QtScript uses the JavaScriptCore engine used by WebKit, but this is an implementation detail and you should not rely on
 this being always true and make assumptions about performance or other factors.
 
-Tap 
-
 If you want to follow along with me, you should check out the code, all of which is in the qtjs folder
-
-Tap 
 
 QtScript
 ========
 The module providing scripting support is called QtScript. In particular we will be making use of 4 key classes:
 
-Tap
-
-QScriptEngine which evaluates scripts and allows us to observe and interact with results
-QScriptValue which wraps Qt/C++ types and exposes them to the JavaScript environment
-QScriptContext which manages the dynamic nature of JavaScript's functions, and
-QScriptable which allows C++ code to access various function properties during the invocation
-
-Tap
-
-Including QtScript in your program is a 2-step process:
-
-Tap
-
-and
-
-Tap 
-
+Including QtScript in your program is a 2-step process
 depending on whether you are using qmake or CMake respectively
 
 With that out of the way, we are ready to code.
 
+QScriptEngine which evaluates scripts and allows us to observe and interact with results. It is the
+class you will always use when working with QtScript, and it drives your entire script along.
+
 The first couple of examples are in the basics folder, just run qmake in basics to compile all of them
 
+executing js
+------------
+As usual, the first program is the Hello World.
 Example 1 is simply executing a javascript program:
 
 open hello.cpp
 
-We create a QScriptEngine instance and let it evaluate the script. There is an associated class called QScriptProgram which can take the string and keep it in compiled form internally. This is useful if you want to execute the program multiple times.
+We create a QScriptEngine instance and let it evaluate the script.
+
+bad script
+----------
 
 To watch out for errors, and report them, the engine provides a couple of functions useful after calling evaluate.
 
@@ -121,11 +86,24 @@ explain
 
 Now that we are executing scripts, what we would really like is to start introducing Qt objects into our scripts.
 
+envelopes
+---------
+
 open intro_num
 
 The global object is available using QScriptEngine::globalObject(). In JavaScript everything is a named property of some other (parent) object. So when we call setProperty("theAnswer") on the global object, we introduce theAnswer as a global variable. QScriptValue() is a wrapper to aid in converting C++ types to JS and back.
 
-But we aren't restricted to just introducing primitives into the script execution environment. Using the Meta-Object System's powerful introspection capabilities, QObjects can be injected, and their properties, signals and slots are all available automagically in QtScript. The next contrived example demonstrates.
+thru the looking glass
+----------------------
+
+this is our overview
+
+qobjects
+--------
+But we aren't restricted to just introducing primitives into the script execution environment. To understand how this works, we need to understand the meta-object system a bit. The various Qt extensions to C++ add extra information to the objects. So a Qt object is 'aware' of its signals and slots and properties. Using the Meta-Object System's powerful introspection capabilities, these are available automagically in QtScript. The next contrived example demonstrates.
+QScriptValue which wraps Qt/C++ types and exposes them to the JavaScript environment
+QScriptContext which manages the dynamic nature of JavaScript's functions, and
+QScriptClass - for extremely granular access control.
 
 open linetext
 
@@ -157,11 +135,16 @@ Here we let the QtScript code call deleteLater. A few times through the event lo
 
 When you want access to all the properties, but still want to be safe, its best to keep the classes that get injected into QtScript separate from the ones that actually drive your application. For example in Rekonq, the extension to allow control over Tabs is in a parallel class rather than extending the actual class managing tabs in rekonq. This parallel class exposes only the extensions API, and talks with the main tab class as required.
 
-Now that we have the fundamentals of QtScript in place, its time for something fun. We are going to create a simple web application framework in JavaScript backed by Qt. A mini node.js just to prove what is possible with QtScript and learn a few other things about QtScript along the way.
+Now that we have the fundamentals of QtScript in place, its time for something fun. We are going to create a simple web application framework in JavaScript backed by Qt. So today there is this
+NextBigThing in the web world about evented web event servers. and every language wants non-blocking code and libraries. We already have it! Qt has signals and slots and non-blocking cross-platform I/O, which is exactly what we want.
+Just to prove a point, we are going to create a mini node.js just to show the possibilities with QtScript and learn a few other things about QtScript along the way.
 
-First open oboy/examples/basic.js to get an idea of what we are aiming for.
+First open oboy/basic.js to get an idea of what we are aiming for.
 
-The first task is to introduce the createServer function. Interestingly it accepts a callback function which will be called for every request. JavaScript has first class functions you can pass around, but C++ doesn't! Fortunately the multi-talented QScriptValue treats a function as just another JavaScript value, and allows you to call it when you see fit. [Also discuss how we introd normal C++ function using engine.newFunction]. So why would you want to create a function and manually inject it into the script runtime when injecting a QObject does it all for free? Apart from obvious design reasons, the main use is to support variable arguments and type checking. When slots are invoked automatically by QtScript, it tries to do a best possible match of the formal C++ arguments and the JavaScript equivalents. But if the match fails, it simply drops the call. Using the manual approach gives you more control. Also with the newQObject approach you have to create an instance of an object and introduce it. But what we want in this case is to create a new server on every invocation of the createServer function. An alternate way is to use Qt's meta-object system, but this one is simpler.
+native functions
+----------------
+The first task is to introduce the createServer function. Interestingly it accepts a callback function which will be called for every request. JavaScript has first class functions you can pass around, but C++ doesn't! Fortunately the multi-talented QScriptValue treats a function as just another JavaScript value, and allows you to call it when you see fit.
+. So why would you want to create a function and manually inject it into the script runtime when injecting a QObject does it all for free? Apart from obvious design reasons, the main use is to support variable arguments and type checking. When slots are invoked automatically by QtScript, it tries to do a best possible match of the formal C++ arguments and the JavaScript equivalents. But if the match fails, it simply drops the call. Using the manual approach gives you more control. Also with the newQObject approach you have to create an instance of an object and introduce it. But what we want in this case is to create a new server on every invocation of the createServer function. An alternate way is to use Qt's meta-object system, but this one is simpler.
 
 All injected functions should have a function prototype of 
 
@@ -171,7 +154,11 @@ The returned QScriptValue() is treated as the return value of the JavaScript fun
 
 open oboy/main.cpp
 
-we define the createServer() function. The context object provides all the information about the environment, including the arguments passed to the function, the this object, and the 'activation object'. We validate the argument as being a callback function and pass it along to the Oboy server. We then wrap the server instance and return it.
+we define the createServer() function.
+At this point I am going to wave my hands and 
+produce this existing piece of code called qhttpserver
+
+The context object provides all the information about the environment, including the arguments passed to the function, the this object, and the 'activation object'. We validate the argument as being a callback function and pass it along to the Oboy server. We then wrap the server instance and return it.
 
 open oboy/oboy.cpp
 
@@ -189,32 +176,119 @@ Since signals are already available for free, an echo server is now trivial.
 
 show oboy/echo.js and run
 
+properties
+-----------
 If you have been observant, you may have realised that the oboy class defines its own listen method too. We don't want to make listen a slot, so we instead tag the declaration with Q_INVOKABLE.
 
 Similarly properties declared with Q_PROPERTY are also available in the script environment. Basically, anything the meta object system has access too, is available in the QtScript system, so you aren't bounded in any way.
 
-Now the default 
+QUESTIONS?
+
+custom types
+------------
+
+we would like a nicer way of setting headers
 By overriding writeHead to accept object literal with headers
 we get QVariantMap
 
-open oboy_writehead
+open oboy_writehead/oboy_writehead.cpp
 
-By providing access to headers, we get conversion functions and meta object
+Occassionally, you want to introduce custom classes
+into your scripts, and perhaps they don't extend
+QObject (eg. data structures), or you want something
+to look like a map in JS, but your C++ object is actually
+dynamically doing stuff based on the properties.
+You can tell QtScript about your new type be registering
+it with the script engine and providing a pair of functions
+to convert to and from the type.
+we would like to access the headers from the browser in a nice manner, so we
+are going to register convertors for reading headers
 
 open oboy_headers
 
-Then explain the concept of extensions
+On the basis of this type registration, some folks
+have created qtscriptgenerator, a set of bindings
+to pretty much the entire Qt API, so that you get
+access to SQL, Webkit or some other APIs. these are
+called extensions, which is compiled JS bindings
+and to use them you will usually
+have a one liner in your C++ to call the script engine's
+importExtension method.
+
+show oboy_ext/main.cpp
+
+For example, here is a script which fetches planet posts
+using QtNetwork, parses it using QtXml and then generates
+a nice HTML page.
 
 open oboy_ext/fetch.js
 
-show custom QScriptClass class by writing a simple ORM.
+So for a web-app, the most important data source is a
+database. So I have written a small wrapper in JS over QtSql
+to simplify some operations. So if you see the
+access pattern, I am accessing the database replies by
+column name and iterating over it. This is achieved
+by using a QScriptClass. The QScriptEngine provides
+C++/JS bridging, the meta type registration gives
+type level controls, but QScriptClass gives very fine control
+by allowing you to decide dynamically, per access
+if you want to deal with an attribute in a special
+manner and lets you do what you want with each property.
 QScriptClass was introduced in Qt 4.4.
 
 open oboy_ext/db.* and query.js
 
-create wiki
+With that, we are almost at the end of the first part. Lets just
+put all these together to make a simple wiki! Less than a 100 lines!
+
+Phew! So that was QtScript. So are there any questions before we go on to webkit?
 
 Webkit
 ------
 
-Some simple browser in which special action happens on google.com or something.
+WebKit is an HTML rendering engine, used by Safari, Chrome and KDE's Rekonq browser.
+Qt allows some QtScript integration with webkit, but it doesn't have the same level
+of control, so this will be short.
+
+first open driver.html in a normal browser and show the source.
+
+So this is a one line page, not very interesting, and with some grammar issues.
+
+Now let's open it in our browser backed by QtWebkit...
+
+There are only three things:
+
+1. wait for the page to load
+2. inject your root object into the page
+3. React to function calls and events
+
+The thedemo.cpp file contains all the useful code, but I have created a tiny
+webkit browser which can only load the 'driver.html' page. The driver calls
+certain functions that are defined by the QObject to achieve useful things.
+
+now the really annoying things about webkit bindings are that you don't get the same
+level of integration like native functions and type conversion and so on.
+So if you want to create a function accepting variable arguments, you will either have
+to create overloads, or write a JavaScript file defining the actual function,
+which will perform argument checking and call the underlying C++ function. This is
+a bit convoluted, and nothing is stopping a malicious user from invoking your C++ function
+directly. So make sure you still do validation in your C++ code.
+
+On the other hand, webkit js code does get access to the DOM.
+
+So the very first answer is just a simple hello world with property access which we already
+saw in QtScript.
+
+The really interesting part is the ability to assign a QPixmap drawing to a HTML element.
+This allows you to create interactive graphics backed by Qt, perhaps because the data source
+in only available via Qt.
+
+Similarly DOM access is achieved back requesting the frame's DOM. You can use simple CSS
+selector syntax to select child elements. You can read and modify content at will.
+
+Ok, well thats it. I am sure there are a lot of questions. 
+
+QUESTIONS?
+
+Feel free to talk to me later if you have some really cool idea using scripting that you don't want
+to be public. Go out and code. Thank You.
