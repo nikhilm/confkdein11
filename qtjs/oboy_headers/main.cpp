@@ -22,7 +22,6 @@ void headersFromScriptValue(const QScriptValue &value, HeaderHash &t)
 {
     Q_UNUSED(value);
     Q_UNUSED(t);
-    qDebug() << "SETTING";
 }
 
 QScriptValue createServer(QScriptContext *context, QScriptEngine *engine)
