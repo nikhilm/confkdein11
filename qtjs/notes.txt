@@ -5,12 +5,10 @@ Title
 
 Morning etc.
 
-Pardon me for the cheesy title, this talk is about...
-
 ...extending Qt applications with
 JavaScript. We'll be going through a lot of stuff in 2 hours, so the session will be intense.
 I assume you know your Qt fundamentals well, which
-includes signals and slots, events and some meta-object capabilities. Knowledge
+includes signals and slots. Knowledge
 of JavaScript is not essential for the most part, but it does affect how we
 code and so an understanding of JavaScript's slippery `this` variable and
 closures will serve you well.
@@ -144,7 +142,7 @@ First open oboy/basic.js to get an idea of what we are aiming for.
 native functions
 ----------------
 The first task is to introduce the createServer function. Interestingly it accepts a callback function which will be called for every request. JavaScript has first class functions you can pass around, but C++ doesn't! Fortunately the multi-talented QScriptValue treats a function as just another JavaScript value, and allows you to call it when you see fit.
-. So why would you want to create a function and manually inject it into the script runtime when injecting a QObject does it all for free? Apart from obvious design reasons, the main use is to support variable arguments and type checking. When slots are invoked automatically by QtScript, it tries to do a best possible match of the formal C++ arguments and the JavaScript equivalents. But if the match fails, it simply drops the call. Using the manual approach gives you more control. Also with the newQObject approach you have to create an instance of an object and introduce it. But what we want in this case is to create a new server on every invocation of the createServer function. An alternate way is to use Qt's meta-object system, but this one is simpler.
+. So why would you want to create a function and manually inject it into the script runtime when injecting a QObject does it all for free? Apart from obvious design reasons, the main use is to support variable arguments and type checking. When slots are invoked automatically by QtScript, it tries to do a best possible match of the formal C++ arguments and the JavaScript equivalents. But if the match fails, it simply drops the call. Using the manual approach gives you more control. Also with the newQObject approach you have to create an instance of an object and introduce it. But what we want in this case is to create a new server on every invocation of the createServer function.
 
 All injected functions should have a function prototype of 
 

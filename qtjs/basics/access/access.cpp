@@ -10,9 +10,9 @@ int main(int argc, char **argv)
     QObject *onTheHeap = new QObject;
     onTheHeap->setObjectName("Arthur");
 
-    QScriptValue repr = eng.newQObject(onTheHeap);
+    //QScriptValue repr = eng.newQObject(onTheHeap);
 
-    //QScriptValue repr = eng.newQObject(onTheHeap, QScriptEngine::ScriptOwnership, QScriptEngine::ExcludeSlots);
+    QScriptValue repr = eng.newQObject(onTheHeap, QScriptEngine::ScriptOwnership, QScriptEngine::ExcludeSlots);
 
     eng.globalObject().setProperty("object", repr);
 

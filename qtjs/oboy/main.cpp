@@ -34,7 +34,9 @@ int main(int argc, char **argv)
 
     QScriptEngine engine;
     
-    engine.globalObject().setProperty("createServer", engine.newFunction(createServer));
+    engine.globalObject().setProperty(
+            "createServer",
+            engine.newFunction(createServer));
 
     QFile file(arguments[1]);
     if( !file.open(QFile::ReadOnly) )

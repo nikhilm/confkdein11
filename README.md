@@ -12,8 +12,12 @@ Scripting a Qt Story
 An introduction to the powerful QtScript module and its integration with Qt and
 your programs.
 
+Slides are a PDF of the Prezi.com presentation
+
 Setting up a KDE development environment
 ----------------------------------------
 
 Interested in contributing to KDE? This talk will help you set up the
-environment to do so.
+environment to do so. This talk has incomplete slides since the talk was
+dropped
+in favour of a bug fixing lab.
