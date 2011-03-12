@@ -13,6 +13,7 @@ An introduction to the powerful QtScript module and its integration with Qt and
 your programs.
 
 Slides are a PDF of the Prezi.com presentation
+Original flash version at http://prezi.com/8gbj8qfz-rdp/qt-javascript-in-progress/
 
 Setting up a KDE development environment
 ----------------------------------------
