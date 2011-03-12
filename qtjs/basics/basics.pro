@@ -10,6 +10,7 @@ SUBDIRS =\
     intro_num \
     linetext2 \
     linetext3 \
+    linetext4 \
     linetext \
     naming \
     access \
